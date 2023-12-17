@@ -8,5 +8,4 @@ export interface Task {
 
 export interface RootState {
   tasks: Task[];
-  // Adicionar outros estados globais aqui
 }
