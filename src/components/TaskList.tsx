@@ -14,14 +14,14 @@ const mapState = (state: RootState) => ({
 const mapDispatch = {
   fetchTasks,
 	deleteTask: (id: number) => ({ type: 'DELETE_TASK', payload: id }),
-	completeTask: (id: number) => ({type: 'COMPLETE_TASK', payload: id})
+	completedTask: (id: number) => ({type: 'COMPLETED_TASK', payload: id})
 };
 
 const connector = connect(mapState, mapDispatch);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, completeTask }) => {
+const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, completedTask }) => {
 	const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 	const [showAddModal, setShowAddModal] = useState<boolean>(false);
 	const [showEditModal, setShowEditModal] = useState<boolean>(false);
@@ -29,6 +29,29 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, com
 	const [taskToEdit, setTaskToEdit] = useState<Task>({} as Task);
 	const [showFullScreenImage, setShowFullScreenImage] = useState<boolean>(false);
   const [fullScreenImageUrl, setFullScreenImageUrl] = useState<string | null>(null);
+
+	const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+  const [taskToComplete, setTaskToComplete] = useState<number | null>(null);
+
+
+	const showConfirmationModalHandler = (taskId: number) => {
+    setTaskToComplete(taskId);
+    setShowConfirmationModal(true);
+  };
+
+  const handleCompleteTask = () => {
+    if (taskToComplete !== null) {
+      completedTask(taskToComplete);
+      setTaskToComplete(null);
+      setShowConfirmationModal(false);
+    }
+  };
+
+  const closeConfirmationModal = () => {
+    setTaskToComplete(null);
+    setShowConfirmationModal(false);
+  };
+
 
 	const showDeleteModalHandler = (task: any) => {
 		setTaskToDelete(task);
@@ -48,6 +71,7 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, com
 
 	const handleHideAddModal = () => {
 		setShowAddModal(false);
+		fetchTasks();
 	};
 
 	const handleShowEditModal = (task: Task) => {
@@ -101,7 +125,7 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, com
 											<img 
 												src={task.image} 
 												alt={task.title} 
-												className='w-10 h-10 object-cover rounded-full cursor-pointer'
+												className='w-6 h-6 object-cover rounded-full cursor-pointer'
         								onClick={() => handleFullScreenImage(task.image)} 
 											/>
 											<button
@@ -117,6 +141,7 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, com
 										<button 
 											disabled={task.completed === true}
 											className='bg-indigo-500 text-white p-1 rounded'
+											onClick={() => task.id !== undefined && showConfirmationModalHandler(task.id)}
 										>
 											<svg 
 												xmlns="http://www.w3.org/2000/svg" 
@@ -181,6 +206,13 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, com
 			content='Tem certeza que deseja excluir esta tarefa?'
 			onConfirm={handleDeleteTask}
 		/>
+		<AlertTasksModal
+        show={showConfirmationModal}
+        onHide={closeConfirmationModal}
+        title='Concluir Tarefa'
+        content='Tem certeza que deseja concluir esta tarefa?'
+        onConfirm={handleCompleteTask}
+      />
 		<CreateTaskModal 
 			show={showAddModal} onHide={handleHideAddModal}
 		/>

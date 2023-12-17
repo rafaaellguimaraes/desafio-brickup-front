@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { addTaskSuccess, deleteTaskSuccess, fetchTasks, fetchTasksFailure, fetchTasksSuccess, updateTaskSuccess } from './actions';
+import { addTaskSuccess, completedTaskSuccess, deleteTaskSuccess, fetchTasks, fetchTasksFailure, fetchTasksSuccess, updateTaskSuccess } from './actions';
 import { RootState, Task } from './types';
 
 const initialState: RootState = {
@@ -19,7 +19,7 @@ export const rootReducer = createReducer(initialState, builder => {
 		})
 		.addCase(addTaskSuccess, (state, action) => {
 			const newTask = action.payload as unknown as Task;
-			state.tasks = [...state.tasks, newTask];
+			state.tasks = state.tasks.concat(newTask);
 		})
 		.addCase(updateTaskSuccess, (state, action) => {
 			const updatedTask = action.payload as Task;
@@ -29,4 +29,8 @@ export const rootReducer = createReducer(initialState, builder => {
 			const taskIdToDelete = action.payload;
 			state.tasks = state.tasks.filter(task => task.id !== taskIdToDelete);
 		})
+		.addCase(completedTaskSuccess, (state, action) => {
+			const completedTaskId = action.payload;
+			state.tasks = state.tasks.map(task => task.id === completedTaskId ? {...task, completed: true} : task);
+		});
 	});

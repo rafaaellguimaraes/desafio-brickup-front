@@ -4,6 +4,9 @@ import {
 	addTask,
 	addTaskFailure,
 	addTaskSuccess,
+	completedTask,
+	completedTaskFailure,
+	completedTaskSuccess,
 	deleteTask,
 	deleteTaskFailure,
 	deleteTaskSuccess,
@@ -55,9 +58,20 @@ function* deleteTaskSaga(action: any): Generator<any, void, any> {
 	}
 }
 
+function* completedTaskSaga(action: any): Generator<any, void, any> {
+	try {
+		const completedTaskId = action.payload;
+		yield call(axios.put, `http://localhost:8080/api/tasks/complete/${completedTaskId}`)
+		yield put(completedTaskSuccess(completedTaskId))
+	} catch (error) {
+		yield put(completedTaskFailure(error as number))
+	}
+}
+
 export default function* rootSaga() {
 	yield takeLatest(fetchTasks.type, fetchTasksSaga);
 	yield takeLatest(addTask.type, addTaskSaga);
 	yield takeLatest(updateTask.type, updateTaskSaga);
 	yield takeLatest(deleteTask.type, deleteTaskSaga);
+	yield takeLatest(completedTask.type, completedTaskSaga);
 }

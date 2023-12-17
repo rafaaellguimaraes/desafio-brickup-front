@@ -16,3 +16,7 @@ export const deleteTaskFailure = createAction<number>('DELETE_TASK_FAILURE');
 export const updateTask = createAction<Task>('UPDATE_TASK');
 export const updateTaskSuccess = createAction<Task>('UPDATE_TASK_SUCCESS');
 export const updateTaskFailure = createAction<number>('UPDATE_TASK_FAILURE');
+
+export const completedTask = createAction<number>('COMPLETED_TASK');
+export const completedTaskSuccess = createAction<number>('COMPLETED_TASK_SUCCESS');
+export const completedTaskFailure = createAction<number>('COMPLETED_TASK_FAILURE');
