@@ -22,7 +22,7 @@ export const rootReducer = createReducer(initialState, builder => {
 			state.tasks = [...state.tasks, newTask];
 		})
 		.addCase(updateTaskSuccess, (state, action) => {
-			const updatedTask = action.payload as unknown as Task;
+			const updatedTask = action.payload as Task;
 			state.tasks = state.tasks.map(task => task.id === updatedTask.id ? updatedTask : task);
 		})
 		.addCase(deleteTaskSuccess, (state, action) => {

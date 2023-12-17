@@ -1,9 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from 'react';
 import { ConnectedProps, connect } from 'react-redux';
 import { fetchTasks } from '../store/actions';
 import { RootState, Task } from '../store/types';
+import AlertTasksModal from './AlertTasksModal';
 import CreateTaskModal from './CreateTaskModal';
-import DeleteTaskModal from './DeleteTasksModal';
+import EditTaskModal from './EditTaskModal';
 
 const mapState = (state: RootState) => ({
   tasks: state.tasks,
@@ -12,16 +14,21 @@ const mapState = (state: RootState) => ({
 const mapDispatch = {
   fetchTasks,
 	deleteTask: (id: number) => ({ type: 'DELETE_TASK', payload: id }),
+	completeTask: (id: number) => ({type: 'COMPLETE_TASK', payload: id})
 };
 
 const connector = connect(mapState, mapDispatch);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask }) => {
+const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, completeTask }) => {
 	const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 	const [showAddModal, setShowAddModal] = useState<boolean>(false);
+	const [showEditModal, setShowEditModal] = useState<boolean>(false);
 	const [taskToDelete, setTaskToDelete] = useState<Task>({} as Task);
+	const [taskToEdit, setTaskToEdit] = useState<Task>({} as Task);
+	const [showFullScreenImage, setShowFullScreenImage] = useState<boolean>(false);
+  const [fullScreenImageUrl, setFullScreenImageUrl] = useState<string | null>(null);
 
 	const showDeleteModalHandler = (task: any) => {
 		setTaskToDelete(task);
@@ -42,6 +49,25 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask }) =
 	const handleHideAddModal = () => {
 		setShowAddModal(false);
 	};
+
+	const handleShowEditModal = (task: Task) => {
+		setTaskToEdit(task);
+		setShowEditModal(true);
+	};
+
+	const handleHideEditModal = () => {
+		setShowEditModal(false);
+	};
+
+	const handleFullScreenImage = (imageUrl: string | null) => {
+    setFullScreenImageUrl(imageUrl);
+    setShowFullScreenImage(true);
+  };
+
+  const closeFullScreenImage = () => {
+    setShowFullScreenImage(false);
+    setFullScreenImageUrl(null);
+  };
 
 
   useEffect(() => {
@@ -70,22 +96,21 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask }) =
 									<td>{task.title}</td>
 									<td>{task.description}</td>
 									<td className='flex items-center justify-center'>
-										{task.image === null ? 'Sem imagem' : 
-											<svg 
-												xmlns="http://www.w3.org/2000/svg" 
-												fill="none" 
-												viewBox="0 0 24 24" 
-												strokeWidth="1.5" 
-												stroke="currentColor" 
-												className="w-6 h-6"
-											>
-												<path 
-													strokeLinecap="round" 
-													strokeLinejoin="round" 
-													d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" 
-												/>
-											</svg>
-										}
+										{task.image === null ? ('Sem imagem') : (
+										<div className="relative">
+											<img 
+												src={task.image} 
+												alt={task.title} 
+												className='w-10 h-10 object-cover rounded-full cursor-pointer'
+        								onClick={() => handleFullScreenImage(task.image)} 
+											/>
+											<button
+        								onClick={() => handleFullScreenImage(task.image)}
+        								className='absolute top-0 right-0 bg-white text-gray-700 p-1 rounded-full'
+      								>
+      								</button>
+										</div>
+										)}
 									</td>
 									<td>{task.completed === false ? 'Pendente' : 'Concluída'}</td>
 									<td className='flex items-center justify-center space-x-2'>
@@ -108,7 +133,7 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask }) =
 													/>
 												</svg>
 											</button>
-										<button className='bg-gray-500 text-white p-1 rounded'>
+										<button className='bg-gray-500 text-white p-1 rounded' onClick={() => handleShowEditModal(task)}>
 											<svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
@@ -149,7 +174,7 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask }) =
 				<button className='mt-3 bg-blue-500 text-white p-2 rounded' onClick={handleShowAddModal}>+ Nova Tarefa</button>
 			</div>
 		</div>
-		<DeleteTaskModal
+		<AlertTasksModal
 			show={showDeleteModal}
 			onHide={() => setShowDeleteModal(false)}
 			title='Excluir Tarefa'
@@ -159,6 +184,17 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask }) =
 		<CreateTaskModal 
 			show={showAddModal} onHide={handleHideAddModal}
 		/>
+		<EditTaskModal 
+			show={showEditModal} onHide={handleHideEditModal} existingTask={taskToEdit}
+		/>
+		{showFullScreenImage && fullScreenImageUrl && (
+        <div
+          className='fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center'
+          onClick={closeFullScreenImage}
+        >
+          <img src={fullScreenImageUrl} alt='Full Screen' className='max-h-full max-w-full' />
+        </div>
+      )}
 	</div>
   );
 };

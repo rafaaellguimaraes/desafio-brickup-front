@@ -8,7 +8,7 @@ interface IConfirmModalProps {
   cancelLabel?: string;
 }
 
-const DeleteTaskModal: React.FC<IConfirmModalProps> = ({
+const AlertTasksModal: React.FC<IConfirmModalProps> = ({
   show,
   onHide,
   title,
@@ -45,4 +45,4 @@ const DeleteTaskModal: React.FC<IConfirmModalProps> = ({
   );
 };
 
-export default DeleteTaskModal;
+export default AlertTasksModal;
