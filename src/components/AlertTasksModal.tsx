@@ -8,7 +8,7 @@ interface IConfirmModalProps {
   cancelLabel?: string;
 }
 
-const AlertTasksModal: React.FC<IConfirmModalProps> = ({
+const AlertTasksModal = ({
   show,
   onHide,
   title,
@@ -16,7 +16,7 @@ const AlertTasksModal: React.FC<IConfirmModalProps> = ({
   onConfirm,
   confirmLabel,
   cancelLabel,
-}) => {
+}: IConfirmModalProps) => {
   return (
     <div
       className={`fixed top-0 left-0 w-full h-screen bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 ${show ? "block" : "hidden"}`}

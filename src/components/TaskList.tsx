@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ConnectedProps, connect } from 'react-redux';
 import { fetchTasks } from '../store/actions';
 import { RootState, Task } from '../store/types';
@@ -21,7 +21,7 @@ const connector = connect(mapState, mapDispatch);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask, completedTask }) => {
+const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRedux) => {
 	const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 	const [showAddModal, setShowAddModal] = useState<boolean>(false);
 	const [showEditModal, setShowEditModal] = useState<boolean>(false);
