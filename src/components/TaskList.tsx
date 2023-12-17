@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ConnectedProps, connect } from 'react-redux';
 import { fetchTasks } from '../store/actions';
 import { RootState, Task } from '../store/types';
+import CreateTaskModal from './CreateTaskModal';
 import DeleteTaskModal from './DeleteTasksModal';
 
 const mapState = (state: RootState) => ({
@@ -10,14 +11,16 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
   fetchTasks,
+	deleteTask: (id: number) => ({ type: 'DELETE_TASK', payload: id }),
 };
 
 const connector = connect(mapState, mapDispatch);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks }) => {
+const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks, deleteTask }) => {
 	const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+	const [showAddModal, setShowAddModal] = useState<boolean>(false);
 	const [taskToDelete, setTaskToDelete] = useState<Task>({} as Task);
 
 	const showDeleteModalHandler = (task: any) => {
@@ -27,8 +30,17 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks }) => {
 
 	const handleDeleteTask = () => {
 		if (taskToDelete.id) {
-			console.log('deletar', taskToDelete.id);
+			deleteTask(taskToDelete.id);
+			setShowDeleteModal(false);
 		}
+	};
+
+	const handleShowAddModal = () => {
+		setShowAddModal(true);
+	};
+
+	const handleHideAddModal = () => {
+		setShowAddModal(false);
 	};
 
 
@@ -47,6 +59,7 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks }) => {
 							<tr>
 								<th scope='col'>Título</th>
 								<th scope='col'>Descrição</th>
+								<th scope='col'>Imagem</th>
 								<th scope='col'>Status</th>
 								<th scope='col'>Ação</th>
 							</tr>
@@ -56,6 +69,24 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks }) => {
 								<tr key={task.id} className='border-b'>
 									<td>{task.title}</td>
 									<td>{task.description}</td>
+									<td className='flex items-center justify-center'>
+										{task.image === null ? 'Sem imagem' : 
+											<svg 
+												xmlns="http://www.w3.org/2000/svg" 
+												fill="none" 
+												viewBox="0 0 24 24" 
+												strokeWidth="1.5" 
+												stroke="currentColor" 
+												className="w-6 h-6"
+											>
+												<path 
+													strokeLinecap="round" 
+													strokeLinejoin="round" 
+													d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" 
+												/>
+											</svg>
+										}
+									</td>
 									<td>{task.completed === false ? 'Pendente' : 'Concluída'}</td>
 									<td className='flex items-center justify-center space-x-2'>
 										<button 
@@ -115,7 +146,7 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks }) => {
 						</tbody>
 					</table>
 				</div>
-				<button className='mt-3 bg-blue-500 text-white p-2 rounded'>+ Nova Tarefa</button>
+				<button className='mt-3 bg-blue-500 text-white p-2 rounded' onClick={handleShowAddModal}>+ Nova Tarefa</button>
 			</div>
 		</div>
 		<DeleteTaskModal
@@ -124,6 +155,9 @@ const TaskList: React.FC<PropsFromRedux> = ({ tasks, fetchTasks }) => {
 			title='Excluir Tarefa'
 			content='Tem certeza que deseja excluir esta tarefa?'
 			onConfirm={handleDeleteTask}
+		/>
+		<CreateTaskModal 
+			show={showAddModal} onHide={handleHideAddModal}
 		/>
 	</div>
   );
