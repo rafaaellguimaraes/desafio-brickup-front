@@ -140,7 +140,9 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
 									<td className='flex items-center justify-center space-x-2'>
 										<button 
 											disabled={task.completed === true}
-											className='bg-indigo-500 text-white p-1 rounded'
+											className={`${
+												task.completed ? 'bg-gray-400 text-gray-600 cursor-not-allowed' : 'bg-indigo-500 text-white'
+											} p-1 rounded`}
 											onClick={() => task.id !== undefined && showConfirmationModalHandler(task.id)}
 										>
 											<svg 
@@ -158,7 +160,13 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
 													/>
 												</svg>
 											</button>
-										<button className='bg-gray-500 text-white p-1 rounded' onClick={() => handleShowEditModal(task)}>
+										<button 
+											disabled={task.completed === true}
+											className={`${
+												task.completed ? 'bg-gray-400 text-gray-600 cursor-not-allowed' : 'bg-indigo-500 text-white'
+											} p-1 rounded`} 
+											onClick={() => handleShowEditModal(task)}
+										>
 											<svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
