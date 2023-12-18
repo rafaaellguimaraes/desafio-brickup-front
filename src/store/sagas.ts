@@ -32,6 +32,7 @@ function* addTaskSaga(action: ReturnType<typeof addTask>): Generator<any, void, 
 		const newTask = action.payload;
 		const response = yield call(axios.post, `http://localhost:8080/api/tasks`, newTask)
 		yield put(addTaskSuccess(response.data))
+		yield put(fetchTasks())
 	} catch (error) {
 		yield put(addTaskFailure())
 	}

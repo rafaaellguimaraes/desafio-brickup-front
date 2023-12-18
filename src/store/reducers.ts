@@ -19,7 +19,7 @@ export const rootReducer = createReducer(initialState, builder => {
 		})
 		.addCase(addTaskSuccess, (state, action) => {
 			const newTask = action.payload as unknown as Task;
-			state.tasks = state.tasks.concat(newTask);
+			state.tasks = [...state.tasks, newTask];
 		})
 		.addCase(updateTaskSuccess, (state, action) => {
 			const updatedTask = action.payload as Task;

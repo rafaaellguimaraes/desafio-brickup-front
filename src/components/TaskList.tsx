@@ -34,11 +34,13 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
   const [taskToComplete, setTaskToComplete] = useState<number | null>(null);
 
 
+	// Função para concluir tarefa
 	const showConfirmationModalHandler = (taskId: number) => {
     setTaskToComplete(taskId);
     setShowConfirmationModal(true);
   };
 
+	// Função para concluir tarefa
   const handleCompleteTask = () => {
     if (taskToComplete !== null) {
       completedTask(taskToComplete);
@@ -47,17 +49,20 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
     }
   };
 
+	// Função para concluir tarefa
   const closeConfirmationModal = () => {
     setTaskToComplete(null);
     setShowConfirmationModal(false);
   };
 
 
+	// Função para excluir tarefa
 	const showDeleteModalHandler = (task: any) => {
 		setTaskToDelete(task);
 		setShowDeleteModal(true);
 	};
 
+	// Função para excluir tarefa
 	const handleDeleteTask = () => {
 		if (taskToDelete.id) {
 			deleteTask(taskToDelete.id);
@@ -65,29 +70,29 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
 		}
 	};
 
+	// Função para adicionar tarefa
 	const handleShowAddModal = () => {
-		setShowAddModal(true);
+		setShowAddModal(previousState => !previousState)
 	};
 
-	const handleHideAddModal = () => {
-		setShowAddModal(false);
-		fetchTasks();
-	};
-
+	// Função para editar tarefa
 	const handleShowEditModal = (task: Task) => {
 		setTaskToEdit(task);
 		setShowEditModal(true);
 	};
 
+	// Função para editar tarefa
 	const handleHideEditModal = () => {
-		setShowEditModal(false);
+		setShowEditModal(previousState => !previousState);
 	};
 
+	// Função para visualizar imagem
 	const handleFullScreenImage = (imageUrl: string | null) => {
     setFullScreenImageUrl(imageUrl);
     setShowFullScreenImage(true);
   };
 
+	// Função para visualizar imagem
   const closeFullScreenImage = () => {
     setShowFullScreenImage(false);
     setFullScreenImageUrl(null);
@@ -104,6 +109,7 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
 			<div className="p-0 text-center">
 				<h5 className="font-bold text-lg p-3 text-gray-700">Lista de tarefas</h5>
 				<div className="overflow-x-auto p-5">
+					{/* Tabela de tarefas */}
 					<table className='table-auto w-full text-gray-500'>
 						<thead className='text-xs text-gray-600 bg-gray-100'>
 							<tr>
@@ -128,15 +134,11 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
 												className='w-6 h-6 object-cover rounded-full cursor-pointer'
         								onClick={() => handleFullScreenImage(task.image)} 
 											/>
-											<button
-        								onClick={() => handleFullScreenImage(task.image)}
-        								className='absolute top-0 right-0 bg-white text-gray-700 p-1 rounded-full'
-      								>
-      								</button>
 										</div>
 										)}
 									</td>
 									<td>{task.completed === false ? 'Pendente' : 'Concluída'}</td>
+									{/* Botões de ação */}
 									<td className='flex items-center justify-center space-x-2'>
 										<button 
 											disabled={task.completed === true}
@@ -207,6 +209,7 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
 				<button className='mt-3 bg-blue-500 text-white p-2 rounded' onClick={handleShowAddModal}>+ Nova Tarefa</button>
 			</div>
 		</div>
+		{/* Modal Excluir tarefa */}
 		<AlertTasksModal
 			show={showDeleteModal}
 			onHide={() => setShowDeleteModal(false)}
@@ -214,6 +217,7 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
 			content='Tem certeza que deseja excluir esta tarefa?'
 			onConfirm={handleDeleteTask}
 		/>
+		{/* Modal Concluir tarefa */}
 		<AlertTasksModal
         show={showConfirmationModal}
         onHide={closeConfirmationModal}
@@ -221,12 +225,15 @@ const TaskList = ({ tasks, fetchTasks, deleteTask, completedTask }: PropsFromRed
         content='Tem certeza que deseja concluir esta tarefa?'
         onConfirm={handleCompleteTask}
       />
+		{/* Modal Adicionar tarefa */}
 		<CreateTaskModal 
-			show={showAddModal} onHide={handleHideAddModal}
+			show={showAddModal} onHide={handleShowAddModal}
 		/>
+		{/* Modal Editar tarefa */}
 		<EditTaskModal 
 			show={showEditModal} onHide={handleHideEditModal} existingTask={taskToEdit}
 		/>
+		{/* Modal Visualizar imagem */}
 		{showFullScreenImage && fullScreenImageUrl && (
         <div
           className='fixed top-0 left-0 w-full h-full bg-black bg-opacity-75 flex items-center justify-center'
